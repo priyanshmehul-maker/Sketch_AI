@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRIMENET — Police Investigation System</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 0: LOGIN -->
+<!-- ============================================================ -->
+<div class="slide active" id="slide-login">
+  <div class="login-wrap">
+    <div class="logo-area">
+      <div class="logo-badge">🛡️</div>
+      <div class="logo-title">SKETCH-MIND</div>
+      <div class="logo-sub">NATIONAL POLICE INVESTIGATION SYSTEM v4.2</div>
+    </div>
+
+    <div class="login-card">
+      <!-- Step indicators -->
+      <div class="step-indicators">
+        <div class="step-dot active" id="dot-1"></div>
+        <div class="step-dot" id="dot-2"></div>
+        <div class="step-dot" id="dot-3"></div>
+      </div>
+
+      <!-- STEP 1: Credentials -->
+      <div id="step-1">
+        <div class="step-label">🟢 STEP 1 — CREDENTIALS VERIFICATION</div>
+
+        <div class="form-group">
+          <label class="form-label">DEPARTMENT ID</label>
+          <input type="text" class="form-input" id="dept-id" placeholder="Enter Department ID">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">PASSWORD</label>
+          <input type="password" class="form-input" id="dept-pass" placeholder="••••••••">
+        </div>
+
+        <button class="btn-primary" onclick="verifyCredentials()">VERIFY CREDENTIALS</button>
+        <div class="error-msg" id="cred-error">⚠ INVALID CREDENTIALS — ACCESS DENIED</div>
+
+        <div class="attempts-bar" id="attempts-bar" style="margin-top:14px;">
+          <div class="attempt-dot" id="att-1"></div>
+          <div class="attempt-dot" id="att-2"></div>
+          <div class="attempt-dot" id="att-3"></div>
+        </div>
+        <div style="text-align:center; font-family: 'Share Tech Mono', monospace; font-size:0.6rem; color:var(--text-muted); margin-top:6px; letter-spacing:1px;">LOGIN ATTEMPTS REMAINING</div>
+      </div>
+
+      <!-- STEP 2: OTP -->
+      <div id="step-2" style="display:none;">
+        <div class="step-label" style="color:var(--accent-gold);">🟡 STEP 2 — OTP VERIFICATION</div>
+
+        <div style="font-family:'Share Tech Mono',monospace; font-size:0.7rem; color:var(--text-secondary); margin-bottom:16px; padding:10px; background:rgba(255,193,7,0.05); border:1px solid rgba(255,193,7,0.2); border-radius:3px; letter-spacing:1px;">
+          📱 OTP sent to registered device •••••67
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">ENTER OTP</label>
+          <input type="text" class="form-input" id="otp-input" placeholder="______" maxlength="6" style="letter-spacing:8px; text-align:center; font-size:1.2rem;">
+        </div>
+
+        <button class="btn-primary" style="border-color:var(--accent-gold);color:var(--accent-gold);" onclick="verifyOTP()">VERIFY OTP</button>
+        <div class="error-msg" id="otp-error">⚠ INVALID OTP — PLEASE TRY AGAIN</div>
+      </div>
+
+      <!-- STEP 3: Role Confirmation -->
+      <div id="step-3" style="display:none;">
+        <div class="step-label" style="color:var(--accent-cyan);">🔵 STEP 3 — ROLE CONFIRMATION</div>
+
+        <div class="role-card">
+          <div class="role-row">
+            <span class="role-key">OFFICER NAME</span>
+            <span class="role-val">DSP RAJKUMAR</span>
+          </div>
+          <div class="role-row">
+            <span class="role-key">ROLE</span>
+            <span class="role-val">DSP</span>
+          </div>
+          <div class="role-row">
+            <span class="role-key">DEPARTMENT</span>
+            <span class="role-val">POLICE1234</span>
+          </div>
+          <div class="role-row">
+            <span class="role-key">ACCESS LEVEL</span>
+            <span class="role-badge">HIGH SECURITY</span>
+          </div>
+          <div class="role-row">
+            <span class="role-key">SESSION EXPIRY</span>
+            <span class="role-val" style="color:var(--accent-gold);">08:00:00</span>
+          </div>
+        </div>
+
+        <button class="btn-primary green" onclick="enterSystem()">ENTER SYSTEM →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- MAIN NAV (shown after login) -->
+<!-- ============================================================ -->
+<div id="main-nav" style="display:none;">
+  <div class="top-nav">
+    <div class="nav-logo">⚔ SKETCH-MIND</div>
+    <div class="nav-info">
+      <div class="nav-chip">OFFICER: <span>DSP RAJKUMAR</span></div>
+      <div class="nav-chip">CASE: <span>FIR/2024/001247</span></div>
+      <div class="nav-chip" id="session-timer">SESSION: <span>07:59:48</span></div>
+    </div>
+    <div class="slide-nav-btns">
+      <button class="nav-btn active-nav" onclick="goSlide(1)" id="nav-1">CASE DETAILS</button>
+      <button class="nav-btn" onclick="goSlide(2)" id="nav-2">FACE MATCH</button>
+      <button class="nav-btn" onclick="goSlide(3)" id="nav-3">EVIDENCE</button>
+      <button class="nav-btn" onclick="goSlide(4)" id="nav-4">INVESTIGATION</button>
+      <button class="nav-btn" onclick="goSlide(5)" id="nav-5">FINAL REPORT</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 1: CASE DETAILS + FACE SKETCH -->
+<!-- ============================================================ -->
+<div class="slide" id="slide-1">
+  <div class="page-header">
+    <div class="page-title">📁 CASE <span>REGISTRATION & FACE SKETCH</span></div>
+    <div class="page-sub">FIR NO: FIR/2024/001247 — STATUS: ACTIVE INVESTIGATION</div>
+  </div>
+
+  <div class="main-grid">
+    <!-- Case Details -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-icon">📋</span>
+        <span class="panel-title">CASE DETAILS</span>
+        <span class="panel-badge badge-active">ACTIVE</span>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-key">CASE ID</div>
+          <div class="info-val highlight">FIR/2024/001247</div>
+        </div>
+        <div class="info-item">
+          <div class="info-key">DATE REGISTERED</div>
+          <div class="info-val">24 MAR 2024</div>
+        </div>
+        <div class="info-item">
+          <div class="info-key">TIME OF CRIME</div>
+          <div class="info-val">02:34 AM</div>
+        </div>
+        <div class="info-item">
+          <div class="info-key">TIME REPORTED</div>
+          <div class="info-val">03:15 AM</div>
+        </div>
+        <div class="info-item full-width">
+          <div class="info-key">CRIME LOCATION</div>
+          <div class="info-val">SECTOR 14, MALVIYA NAGAR, JAIPUR, RAJASTHAN</div>
+        </div>
+        <div class="info-item">
+          <div class="info-key">POLICE STATION</div>
+          <div class="info-val">MALVIYA NAGAR PS</div>
+        </div>
+        <div class="info-item">
+          <div class="info-key">CRIME TYPE</div>
+          <div class="info-val" style="color:var(--accent-red);">ARMED ROBBERY</div>
+        </div>
+        <div class="info-item full-width">
+          <div class="info-key">INVESTIGATING OFFICER</div>
+          <div class="info-val">DSP RAJKUMAR SHARMA (DEPT: POLICE1234)</div>
+        </div>
+        <div class="info-item">
+          <div class="info-key">VICTIM NAME</div>
+          <div class="info-val">RAMESH GUPTA</div>
+        </div>
+        <div class="info-item">
+          <div class="info-key">VICTIM MOBILE</div>
+          <div class="info-val">98XX-XXXX-XX</div>
+        </div>
+        <div class="info-item full-width">
+          <div class="info-key">BRIEF DESCRIPTION</div>
+          <div class="info-val" style="font-size:0.8rem;">Male suspect, approx 25-30 yrs, medium build, armed with knife, fled on motorcycle.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Face Sketch -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-icon">🎨</span>
+        <span class="panel-title">WITNESS FACE SKETCH</span>
+        <span class="panel-badge badge-pending">DRAFTING</span>
+      </div>
+
+      <!-- Sketch Face Canvas -->
+      <div class="sketch-face-area">
+        <svg class="sketch-svg" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <!-- Grid -->
+          <line x1="100" y1="10" x2="100" y2="210" stroke="rgba(0,170,255,0.1)" stroke-width="0.5"/>
+          <line x1="10" y1="110" x2="190" y2="110" stroke="rgba(0,170,255,0.1)" stroke-width="0.5"/>
+          <!-- Face shape -->
+          <ellipse id="sk-face" cx="100" cy="100" rx="65" ry="80" fill="none" stroke="#00aaff" stroke-width="1.5" opacity="0.7" filter="url(#glow)"/>
+          <!-- Eyes -->
+          <ellipse id="sk-eye-l" cx="74" cy="85" rx="12" ry="7" fill="none" stroke="#00e5ff" stroke-width="1.2"/>
+          <circle cx="74" cy="85" r="4" fill="#00e5ff" opacity="0.6"/>
+          <ellipse id="sk-eye-r" cx="126" cy="85" rx="12" ry="7" fill="none" stroke="#00e5ff" stroke-width="1.2"/>
+          <circle cx="126" cy="85" r="4" fill="#00e5ff" opacity="0.6"/>
+          <!-- Nose -->
+          <path id="sk-nose" d="M100 95 L93 118 Q100 122 107 118 Z" fill="none" stroke="#00aaff" stroke-width="1"/>
+          <!-- Mouth -->
+          <path id="sk-mouth" d="M82 135 Q100 148 118 135" fill="none" stroke="#00aaff" stroke-width="1.5"/>
+          <!-- Eyebrows -->
+          <path id="sk-brow-l" d="M60 73 Q74 66 88 73" fill="none" stroke="#00aaff" stroke-width="1.8"/>
+          <path id="sk-brow-r" d="M112 73 Q126 66 140 73" fill="none" stroke="#00aaff" stroke-width="1.8"/>
+          <!-- Ears -->
+          <ellipse cx="35" cy="100" rx="8" ry="16" fill="none" stroke="#00aaff" stroke-width="1" opacity="0.5"/>
+          <ellipse cx="165" cy="100" rx="8" ry="16" fill="none" stroke="#00aaff" stroke-width="1" opacity="0.5"/>
+          <!-- Hair -->
+          <path id="sk-hair" d="M35 80 Q40 25 100 18 Q160 25 165 80" fill="none" stroke="#00aaff" stroke-width="2" opacity="0.6"/>
+          <!-- Scan overlay -->
+          <line id="scan-bar" x1="10" y1="30" x2="190" y2="30" stroke="rgba(0,229,255,0.5)" stroke-width="1">
+            <animateTransform attributeName="transform" type="translate" values="0,0;0,180;0,0" dur="3s" repeatCount="indefinite"/>
+          </line>
+          <!-- Corner marks -->
+          <path d="M10,10 L10,25 M10,10 L25,10" stroke="#00e5ff" stroke-width="1.5" fill="none"/>
+          <path d="M190,10 L190,25 M190,10 L175,10" stroke="#00e5ff" stroke-width="1.5" fill="none"/>
+          <path d="M10,210 L10,195 M10,210 L25,210" stroke="#00e5ff" stroke-width="1.5" fill="none"/>
+          <path d="M190,210 L190,195 M190,210 L175,210" stroke="#00e5ff" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+
+      <!-- Feature selectors -->
+      <div class="sketch-controls">
+        <select class="sketch-select" onchange="updateSketch('hair',this.value)">
+          <option value="short">HAIR: Short</option>
+          <option value="long">HAIR: Long</option>
+          <option value="bald">HAIR: Bald</option>
+          <option value="curly">HAIR: Curly</option>
+        </select>
+        <select class="sketch-select" onchange="updateSketch('eye',this.value)">
+          <option value="normal">EYES: Normal</option>
+          <option value="small">EYES: Small</option>
+          <option value="large">EYES: Large</option>
+          <option value="narrow">EYES: Narrow</option>
+        </select>
+        <select class="sketch-select" onchange="updateSketch('nose',this.value)">
+          <option value="normal">NOSE: Normal</option>
+          <option value="wide">NOSE: Wide</option>
+          <option value="sharp">NOSE: Sharp</option>
+        </select>
+        <select class="sketch-select" onchange="updateSketch('mouth',this.value)">
+          <option value="normal">MOUTH: Normal</option>
+          <option value="thin">MOUTH: Thin Lips</option>
+          <option value="full">MOUTH: Full Lips</option>
+        </select>
+        <select class="sketch-select" onchange="updateSketch('brow',this.value)">
+          <option value="normal">BROW: Normal</option>
+          <option value="thick">BROW: Thick</option>
+          <option value="thin">BROW: Thin</option>
+          <option value="arch">BROW: High Arch</option>
+        </select>
+        <select class="sketch-select" onchange="updateSketch('face',this.value)">
+          <option value="oval">FACE: Oval</option>
+          <option value="round">FACE: Round</option>
+          <option value="square">FACE: Square</option>
+          <option value="long">FACE: Long</option>
+        </select>
+      </div>
+
+      <!-- Witness info -->
+      <div class="witness-grid" style="margin-bottom:10px;">
+        <input type="text" class="w-input" placeholder="WITNESS NAME">
+        <input type="text" class="w-input" placeholder="APPROX AGE: 25-30">
+        <input type="text" class="w-input" placeholder="HEIGHT: 5'8&quot;">
+        <input type="text" class="w-input" placeholder="BUILD: MEDIUM">
+        <input type="text" class="w-input" placeholder="COMPLEXION: WHEATISH">
+        <input type="text" class="w-input" placeholder="DISTINGUISHING MARKS">
+      </div>
+
+      <div class="sketch-btns">
+        <button class="btn-sm primary">💾 SAVE SKETCH</button>
+        <button class="btn-sm">🔄 RESET</button>
+        <button class="btn-sm primary" onclick="goSlide(2); showVerifyAnimation();">🔍 MATCH FACE →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 2: VERIFICATION + MATCHED FACES -->
+<!-- ============================================================ -->
+<div class="slide" id="slide-2">
+  <!-- Verification animation -->
+  <div id="verify-anim" class="verify-screen">
+    <div class="verify-ring">
+      <div class="verify-inner">🔍</div>
+    </div>
+    <div class="verify-label">SCANNING DATABASE — PLEASE WAIT</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-muted);letter-spacing:2px;margin-bottom:20px;">ANALYZING FACIAL FEATURE VECTORS...</div>
+
+    <div class="verify-steps" id="verify-steps-list">
+      <div class="v-step active" id="vs-1"><span class="v-step-icon">⏳</span> LOADING NATIONAL CRIME DATABASE</div>
+      <div class="v-step" id="vs-2"><span class="v-step-icon">○</span> EXTRACTING FACIAL LANDMARKS</div>
+      <div class="v-step" id="vs-3"><span class="v-step-icon">○</span> RUNNING AI MATCH ALGORITHM</div>
+      <div class="v-step" id="vs-4"><span class="v-step-icon">○</span> CROSS-REFERENCING POLICE RECORDS</div>
+      <div class="v-step" id="vs-5"><span class="v-step-icon">○</span> RANKING SUSPECT MATCHES</div>
+    </div>
+
+    <div class="progress-bar-wrap" style="width:360px;">
+      <div class="progress-fill" id="verify-progress" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="match-results" style="display:none;">
+    <div class="page-header">
+      <div class="page-title">🔍 MATCHED <span>SUSPECTS</span></div>
+      <div class="page-sub">AI FACE MATCH — 6 RESULTS FOUND — SORTED BY MATCH PERCENTAGE</div>
+    </div>
+
+    <div class="suspects-grid">
+      <!-- Suspect 1 -->
+      <div class="suspect-card top-match" onclick="goSlide(3)">
+        <div class="suspect-rank">#1 TOP MATCH</div>
+        <div class="suspect-avatar">👤</div>
+        <div class="match-pct high">94.7%</div>
+        <div class="match-bar"><div class="match-fill high" style="width:94.7%"></div></div>
+        <div class="suspect-name">VIKRAM SINGH</div>
+        <div class="suspect-details">
+          <div class="sd-row"><span class="sd-key">AGE</span><span class="sd-val">28 YRS</span></div>
+          <div class="sd-row"><span class="sd-key">LAST KNOWN</span><span class="sd-val">JAIPUR</span></div>
+          <div class="sd-row"><span class="sd-key">PRIOR FIR</span><span class="sd-val" style="color:var(--accent-red);">3 CASES</span></div>
+          <div class="sd-row"><span class="sd-key">STATUS</span><span class="sd-val" style="color:var(--accent-gold);">WANTED</span></div>
+        </div>
+        <div class="tag tag-red" style="margin-top:8px;">⚠ HIGH RISK</div>
+      </div>
+
+      <!-- Suspect 2 -->
+      <div class="suspect-card">
+        <div class="suspect-rank">#2</div>
+        <div class="suspect-avatar">👤</div>
+        <div class="match-pct med">78.3%</div>
+        <div class="match-bar"><div class="match-fill med" style="width:78.3%"></div></div>
+        <div class="suspect-name">ROHIT MEENA</div>
+        <div class="suspect-details">
+          <div class="sd-row"><span class="sd-key">AGE</span><span class="sd-val">31 YRS</span></div>
+          <div class="sd-row"><span class="sd-key">LAST KNOWN</span><span class="sd-val">AJMER</span></div>
+          <div class="sd-row"><span class="sd-key">PRIOR FIR</span><span class="sd-val" style="color:var(--accent-gold);">1 CASE</span></div>
+          <div class="sd-row"><span class="sd-key">STATUS</span><span class="sd-val">RELEASED</span></div>
+        </div>
+        <div class="tag tag-blue" style="margin-top:8px;">MEDIUM RISK</div>
+      </div>
+
+      <!-- Suspect 3 -->
+      <div class="suspect-card">
+        <div class="suspect-rank">#3</div>
+        <div class="suspect-avatar">👤</div>
+        <div class="match-pct" style="color:var(--accent-blue);">65.1%</div>
+        <div class="match-bar"><div class="match-fill" style="width:65.1%"></div></div>
+        <div class="suspect-name">SURESH KUMAR</div>
+        <div class="suspect-details">
+          <div class="sd-row"><span class="sd-key">AGE</span><span class="sd-val">26 YRS</span></div>
+          <div class="sd-row"><span class="sd-key">LAST KNOWN</span><span class="sd-val">KOTA</span></div>
+          <div class="sd-row"><span class="sd-key">PRIOR FIR</span><span class="sd-val">NONE</span></div>
+          <div class="sd-row"><span class="sd-key">STATUS</span><span class="sd-val">CLEAN</span></div>
+        </div>
+        <div class="tag tag-blue" style="margin-top:8px;">LOW RISK</div>
+      </div>
+
+      <!-- Suspect 4 -->
+      <div class="suspect-card">
+        <div class="suspect-rank">#4</div>
+        <div class="suspect-avatar">👤</div>
+        <div class="match-pct" style="color:var(--accent-blue);">58.9%</div>
+        <div class="match-bar"><div class="match-fill" style="width:58.9%"></div></div>
+        <div class="suspect-name">ANIL SHARMA</div>
+        <div class="suspect-details">
+          <div class="sd-row"><span class="sd-key">AGE</span><span class="sd-val">34 YRS</span></div>
+          <div class="sd-row"><span class="sd-key">LAST KNOWN</span><span class="sd-val">BIKANER</span></div>
+          <div class="sd-row"><span class="sd-key">PRIOR FIR</span><span class="sd-val" style="color:var(--accent-gold);">2 CASES</span></div>
+          <div class="sd-row"><span class="sd-key">STATUS</span><span class="sd-val">PAROLED</span></div>
+        </div>
+        <div class="tag tag-blue" style="margin-top:8px;">MEDIUM RISK</div>
+      </div>
+
+      <!-- Suspect 5 -->
+      <div class="suspect-card">
+        <div class="suspect-rank">#5</div> 
+        <div class="suspect-avatar">👤</div>
+        <div class="match-pct" style="color:var(--accent-blue);">47.2%</div>
+        <div class="match-bar"><div class="match-fill" style="width:47.2%"></div></div>
+        <div class="suspect-name">MOHIT YADAV</div>
+        <div class="suspect-details">
+          <div class="sd-row"><span class="sd-key">AGE</span><span class="sd-val">29 YRS</span></div>
+          <div class="sd-row"><span class="sd-key">LAST KNOWN</span><span class="sd-val">SIKAR</span></div>
+          <div class="sd-row"><span class="sd-key">PRIOR FIR</span><span class="sd-val">NONE</span></div>
+          <div class="sd-row"><span class="sd-key">STATUS</span><span class="sd-val">CLEAN</span></div>
+        </div>
+        <div class="tag tag-blue" style="margin-top:8px;">LOW RISK</div>
+      </div>
+
+      <!-- Suspect 6 -->
+      <div class="suspect-card">
+        <div class="suspect-rank">#6</div>
+        <div class="suspect-avatar">👤</div>
+        <div class="match-pct" style="color:var(--accent-blue);">38.5%</div>
+        <div class="match-bar"><div class="match-fill" style="width:38.5%"></div></div>
+        <div class="suspect-name">DEEPAK VERMA</div>
+        <div class="suspect-details">
+          <div class="sd-row"><span class="sd-key">AGE</span><span class="sd-val">32 YRS</span></div>
+          <div class="sd-row"><span class="sd-key">LAST KNOWN</span><span class="sd-val">JODHPUR</span></div>
+          <div class="sd-row"><span class="sd-key">PRIOR FIR</span><span class="sd-val">NONE</span></div>
+          <div class="sd-row"><span class="sd-key">STATUS</span><span class="sd-val">CLEAN</span></div>
+        </div>
+        <div class="tag tag-blue" style="margin-top:8px;">LOW RISK</div>
+      </div>
+    </div>
+
+    <div style="padding:0 24px 24px; display:flex; gap:12px;">
+      <button class="btn-proceed" style="flex:1;" onclick="goSlide(3)">PROCEED TO EVIDENCE SCAN →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 3: EVIDENCE SCANNING -->
+<!-- ============================================================ -->
+<div class="slide" id="slide-3">
+  <div class="page-header">
+    <div class="page-title">🎥 EVIDENCE <span>SCANNING</span></div>
+    <div class="page-sub">BIOMETRIC ANALYSIS — FACE RECONSTRUCTION & FINGERPRINT</div>
+  </div>
+
+  <!-- Flow indicator -->
+  <div class="flow-indicator">
+    <div class="flow-step active" id="flow-face">📷 FACE SCAN</div>
+    <div class="flow-arrow">▶</div>
+    <div class="flow-step" id="flow-fp">🖐 FINGERPRINT</div>
+    <div class="flow-arrow">▶</div>
+    <div class="flow-step" id="flow-result">✅ RESULT</div>
+  </div>
+
+  <div class="evidence-layout">
+    <!-- Face Scan Panel -->
+    <div class="scan-panel" id="face-scan-panel">
+      <div class="panel-header">
+        <span class="panel-icon">📷</span>
+        <span class="panel-title">FACE RECONSTRUCTION — CCTV ANALYSIS</span>
+        <span class="panel-badge badge-pending" id="face-status-badge">SCANNING</span>
+      </div>
+
+      <div class="scan-area" id="face-scan-area">
+        <!-- Video feed simulation -->
+        <div style="position:absolute;top:8px;left:8px;font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--accent-red);letter-spacing:1px;">● REC 02:34:17</div>
+        <div style="position:absolute;top:8px;right:8px;font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--text-muted);">CAM-04 SECTOR-14</div>
+
+        <div class="face-scan-container" id="face-scan-cont">
+          <div class="face-outline">
+            <div class="scan-line-h"></div>
+            <div class="corner-mark corner-tl"></div>
+            <div class="corner-mark corner-tr"></div>
+            <div class="corner-mark corner-bl"></div>
+            <div class="corner-mark corner-br"></div>
+            <div class="face-dots">
+              <div class="face-dot" style="top:30%;left:25%;animation-delay:0s;"></div>
+              <div class="face-dot" style="top:30%;left:65%;animation-delay:0.3s;"></div>
+              <div class="face-dot" style="top:55%;left:45%;animation-delay:0.6s;"></div>
+              <div class="face-dot" style="top:70%;left:30%;animation-delay:0.9s;"></div>
+              <div class="face-dot" style="top:70%;left:60%;animation-delay:1.2s;"></div>
+              <div class="face-dot" style="top:50%;left:10%;animation-delay:0.4s;"></div>
+              <div class="face-dot" style="top:50%;left:80%;animation-delay:0.7s;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="scan-status-overlay" id="face-scan-status">
+          <span style="animation:blink 1s infinite;">ANALYZING CCTV FOOTAGE...</span>
+        </div>
+
+        <!-- Reconstructed face (hidden initially) -->
+        <div id="reconstructed-face" style="display:none; text-align:center;">
+          <svg width="130" height="170" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="100" cy="100" rx="65" ry="80" fill="rgba(0,170,255,0.05)" stroke="#00e5ff" stroke-width="2"/>
+            <ellipse cx="74" cy="85" rx="12" ry="7" fill="rgba(0,229,255,0.1)" stroke="#00e5ff" stroke-width="1.5"/>
+            <circle cx="74" cy="85" r="4" fill="#00e5ff"/>
+            <ellipse cx="126" cy="85" rx="12" ry="7" fill="rgba(0,229,255,0.1)" stroke="#00e5ff" stroke-width="1.5"/>
+            <circle cx="126" cy="85" r="4" fill="#00e5ff"/>
+            <path d="M100 95 L93 118 Q100 122 107 118 Z" fill="none" stroke="#00aaff" stroke-width="1.5"/>
+            <path d="M82 135 Q100 148 118 135" fill="none" stroke="#00aaff" stroke-width="2"/>
+            <path d="M60 73 Q74 66 88 73" fill="none" stroke="#00aaff" stroke-width="2.5"/>
+            <path d="M112 73 Q126 66 140 73" fill="none" stroke="#00aaff" stroke-width="2.5"/>
+            <path d="M35 80 Q40 25 100 18 Q160 25 165 80" fill="rgba(0,170,255,0.1)" stroke="#00aaff" stroke-width="2"/>
+          </svg>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--accent-cyan);letter-spacing:1px;margin-top:4px;">AI RECONSTRUCTED FACE</div>
+        </div>
+      </div>
+
+      <div class="evidence-result matched" id="face-match-result">✅ FACE MATCHED — VIKRAM SINGH (94.7%)</div>
+      <div class="evidence-result not-matched" id="face-nomatch-result">❌ NO CLEAR MATCH FOUND IN DATABASE</div>
+
+      <div class="scan-btns">
+        <button class="scan-btn primary-scan" onclick="runFaceScan()">🎬 RECONSTRUCT FACE USING AI</button>
+        <button class="scan-btn no-data" onclick="faceNoData()">⚠ DATA NOT AVAILABLE</button>
+      </div>
+    </div>
+
+    <!-- Fingerprint Panel -->
+    <div class="scan-panel" id="fp-scan-panel">
+      <div class="panel-header">
+        <span class="panel-icon">🖐</span>
+        <span class="panel-title">FINGERPRINT SCANNING</span>
+        <span class="panel-badge" id="fp-status-badge" style="background:rgba(0,170,255,0.05);border:1px solid var(--border-dim);color:var(--text-muted);">WAITING</span>
+      </div>
+
+      <div class="scan-area" id="fp-scan-area">
+        <div class="fp-scan-area">
+          <svg class="fp-svg" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="fp-glow"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <g stroke="#00aaff" stroke-width="0.8" fill="none" filter="url(#fp-glow)" class="fp-lines" id="fp-lines">
+              <path d="M50,5 Q80,5 90,30 Q95,50 90,70 Q80,95 50,105 Q20,95 10,70 Q5,50 10,30 Q20,5 50,5"/>
+              <path d="M50,15 Q72,15 80,35 Q85,52 80,68 Q70,88 50,96 Q30,88 20,68 Q15,52 20,35 Q28,15 50,15"/>
+              <path d="M50,25 Q66,25 72,40 Q76,55 70,68 Q62,83 50,88 Q38,83 30,68 Q24,55 28,40 Q34,25 50,25"/>
+              <path d="M50,35 Q60,35 63,47 Q66,58 60,68 Q56,76 50,78 Q44,76 40,68 Q34,58 37,47 Q40,35 50,35"/>
+              <path d="M50,45 Q55,45 56,55 Q57,62 50,66 Q43,62 44,55 Q45,45 50,45"/>
+              <path d="M35,80 Q50,110 65,80" />
+              <path d="M28,65 Q50,120 72,65"/>
+              <path d="M22,52 Q50,128 78,52"/>
+            </g>
+            <!-- Scan pulse -->
+            <ellipse cx="50" cy="65" rx="48" ry="60" fill="none" stroke="rgba(0,229,255,0.3)" stroke-width="1" id="fp-pulse">
+              <animate attributeName="rx" values="0;48;0" dur="2s" repeatCount="indefinite"/>
+              <animate attributeName="ry" values="0;60;0" dur="2s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0;1" dur="2s" repeatCount="indefinite"/>
+            </ellipse>
+          </svg>
+        </div>
+        <div class="scan-status-overlay" id="fp-scan-status">AWAITING FINGERPRINT INPUT...</div>
+      </div>
+
+      <div class="evidence-result matched" id="fp-match-result">✅ FINGERPRINT MATCHED — VIKRAM SINGH</div>
+      <div class="evidence-result not-matched" id="fp-nomatch-result">❌ NO FINGERPRINT MATCH FOUND</div>
+
+      <div class="scan-btns">
+        <button class="scan-btn primary-scan" id="fp-scan-btn" onclick="runFPScan()" disabled style="opacity:0.4;cursor:not-allowed;">🖐 START FINGERPRINT SCAN</button>
+        <button class="scan-btn no-data" onclick="fpNoData()">⚠ NO DATA AVAILABLE</button>
+      </div>
+
+      <div class="skip-row">
+        <button class="scan-btn skip" style="width:100%;padding:12px;" onclick="proceedWithoutEvidence()">⚡ PROCEED WITHOUT EVIDENCE — SKIP THIS STEP</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:0 24px 24px;">
+    <button class="btn-proceed" id="proceed-to-invest" onclick="goSlide(4)" style="display:none;">PROCEED TO INVESTIGATION →</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 4: INVESTIGATION -->
+<!-- ============================================================ -->
+<div class="slide" id="slide-4">
+  <div class="page-header">
+    <div class="page-title">🔎 INVESTIGATION <span>PANEL</span></div>
+    <div class="page-sub">MULTI-STATION VERIFICATION — SECURE DATABASE ACCESS</div>
+  </div>
+
+  <!-- Case indicator — sirf read only, click nahi hoga -->
+  <div id="case-indicator" style="display:none; padding:0 24px 14px;">
+    <div id="case-a-indicator" style="display:none; font-family:'Share Tech Mono',monospace; font-size:0.72rem; color:var(--accent-green); padding:10px 16px; background:rgba(0,230,118,0.07); border:1px solid rgba(0,230,118,0.3); border-radius:3px; letter-spacing:2px;">
+      ✅ CASE A — EVIDENCE AVAILABLE &nbsp;|&nbsp; SUSPECT IDENTIFIED VIA BIOMETRIC SCAN
+    </div>
+    <div id="case-b-indicator" style="display:none; font-family:'Share Tech Mono',monospace; font-size:0.72rem; color:var(--accent-gold); padding:10px 16px; background:rgba(255,193,7,0.07); border:1px solid rgba(255,193,7,0.3); border-radius:3px; letter-spacing:2px;">
+      🔶 CASE B — NO EVIDENCE AVAILABLE &nbsp;|&nbsp; PROCEEDING WITH AI SUSPECT LIST ONLY
+    </div>
+  </div>
+
+  <!-- CASE A: Evidence Available -->
+  <div id="case-a-content" style="display:none;">
+    <div class="invest-layout">
+      <!-- Suspect Profile -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-icon">🎯</span>
+          <span class="panel-title">SUSPECT PROFILE — PRIMARY</span>
+          <span class="panel-badge badge-alert">HIGH RISK</span>
+        </div>
+
+        <div style="display:flex; gap:16px; align-items:center; margin-bottom:16px; padding:12px; background:rgba(255,59,59,0.05); border:1px solid rgba(255,59,59,0.2); border-radius:4px;">
+          <div style="width:60px;height:60px;background:rgba(255,59,59,0.1);border:2px solid var(--accent-red);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;">👤</div>
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;letter-spacing:2px;">VIKRAM SINGH</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--accent-red);letter-spacing:1px;">MATCH: 94.7% — WANTED</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-muted);margin-top:2px;">DOB: 12-MAR-1996 | MALE</div>
+          </div>
+        </div>
+
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="switchTab(this,'personal')">PERSONAL</button>
+          <button class="tab-btn" onclick="switchTab(this,'financial')">FINANCIAL</button>
+          <button class="tab-btn" onclick="switchTab(this,'social')">SOCIAL</button>
+          <button class="tab-btn" onclick="switchTab(this,'family')">FAMILY</button>
+        </div>
+
+        <div class="tab-content active" id="tab-personal">
+          <div class="detail-section">
+            <div class="detail-section-title">GOVT. IDENTITY (SECURED)</div>
+            <div class="detail-row"><span class="detail-key">AADHAAR</span><span class="detail-val masked" title="Click to reveal">XXXX-XXXX-8821</span></div>
+            <div class="detail-row"><span class="detail-key">PAN CARD</span><span class="detail-val masked" title="Click to reveal">XXXPS1234X</span></div>
+            <div class="detail-row"><span class="detail-key">VOTER ID</span><span class="detail-val masked">RAJ/XXX/XXX234</span></div>
+            <div class="detail-row"><span class="detail-key">DL NUMBER</span><span class="detail-val">RJ-14-20180-01234</span></div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-title">CONTACT DETAILS</div>
+            <div class="detail-row"><span class="detail-key">MOBILE</span><span class="detail-val">98XX-XXXX-11</span></div>
+            <div class="detail-row"><span class="detail-key">ADDRESS</span><span class="detail-val">H.NO 47, WARD 12, JAIPUR</span></div>
+            <div class="detail-row"><span class="detail-key">HOMETOWN</span><span class="detail-val">SIKAR, RAJASTHAN</span></div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-financial">
+          <div class="detail-section">
+            <div class="detail-section-title">BANK DETAILS (MASKED)</div>
+            <div class="detail-row"><span class="detail-key">BANK NAME</span><span class="detail-val">SBI JAIPUR BRANCH</span></div>
+            <div class="detail-row"><span class="detail-key">AC NO.</span><span class="detail-val masked">XXXX-XXXX-3421</span></div>
+            <div class="detail-row"><span class="detail-key">IFSC</span><span class="detail-val">SBIN00XXXXX</span></div>
+            <div class="detail-row"><span class="detail-key">LAST TXN</span><span class="detail-val red">₹1,45,000 (SUSPICIOUS)</span></div>
+            <div class="detail-row"><span class="detail-key">BALANCE</span><span class="detail-val masked">HIDDEN</span></div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-social">
+          <div class="detail-section-title">SOCIAL MEDIA ACTIVITY</div>
+          <div class="social-item">
+            <div class="social-icon">📘</div>
+            <div class="social-info">
+              <div class="social-platform">FACEBOOK</div>
+              <div class="social-detail">Last active: 23 MAR 2024 — @vikram.s.jpr</div>
+            </div>
+            <div class="social-flag" style="color:var(--accent-gold);">⚠</div>
+          </div>
+          <div class="social-item">
+            <div class="social-icon">📸</div>
+            <div class="social-info">
+              <div class="social-platform">INSTAGRAM</div>
+              <div class="social-detail">Account deactivated day of crime</div>
+            </div>
+            <div class="social-flag" style="color:var(--accent-red);">🚨</div>
+          </div>
+          <div class="social-item">
+            <div class="social-icon">💬</div>
+            <div class="social-info">
+              <div class="social-platform">WHATSAPP</div>
+              <div class="social-detail">Location ping: Sector 14 at 02:20 AM</div>
+            </div>
+            <div class="social-flag" style="color:var(--accent-red);">🚨</div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-family">
+          <div class="detail-section">
+            <div class="detail-section-title">FAMILY BACKGROUND</div>
+            <div class="detail-row"><span class="detail-key">FATHER</span><span class="detail-val">RATAN SINGH (DECEASED)</span></div>
+            <div class="detail-row"><span class="detail-key">MOTHER</span><span class="detail-val">KAMLA DEVI — SIKAR</span></div>
+            <div class="detail-row"><span class="detail-key">SIBLINGS</span><span class="detail-val">1 BROTHER (ACCUSED IN FIR-2021)</span></div>
+            <div class="detail-row"><span class="detail-key">MARITAL</span><span class="detail-val">UNMARRIED</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Station Check + Criminal Record -->
+      <div>
+        <div class="panel" style="margin-bottom:16px;">
+          <div class="panel-header">
+            <span class="panel-icon">🏛</span>
+            <span class="panel-title">MULTI-STATION VERIFICATION</span>
+          </div>
+
+          <div class="station-card">
+            <div>
+              <div class="station-name">MALVIYA NAGAR PS — JAIPUR</div>
+              <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-muted);">PRIMARY STATION</div>
+            </div>
+            <div class="station-status ss-verified">✓ VERIFIED</div>
+          </div>
+
+          <div class="station-card">
+            <div>
+              <div class="station-name">SIKAR CITY PS — HOMETOWN</div>
+              <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-muted);">HOMETOWN STATION</div>
+            </div>
+            <div class="station-status ss-verified">✓ VERIFIED</div>
+          </div>
+
+          <div class="station-card">
+            <div>
+              <div class="station-name">RAJASTHAN CRIME BRANCH</div>
+              <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-muted);">STATE LEVEL</div>
+            </div>
+            <div class="station-status ss-pending">⏳ PENDING</div>
+          </div>
+
+          <div class="station-card">
+            <div>
+              <div class="station-name">NCCRB — NATIONAL DATABASE</div>
+              <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-muted);">NATIONAL LEVEL</div>
+            </div>
+            <div class="station-status ss-verified">✓ VERIFIED</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-icon">📜</span>
+            <span class="panel-title">CRIMINAL RECORD</span>
+            <span class="panel-badge badge-alert">3 PRIORS</span>
+          </div>
+
+          <div class="crime-record">
+            <div class="crime-title">FIR-2021/00872 — ROBBERY</div>
+            <div class="crime-meta">STATION: MANSAROVAR PS | DATE: 12-JUN-2021 | BAILED</div>
+          </div>
+          <div class="crime-record">
+            <div class="crime-title">FIR-2022/01134 — ASSAULT</div>
+            <div class="crime-meta">STATION: SIKAR PS | DATE: 08-NOV-2022 | ACQUITTED</div>
+          </div>
+          <div class="crime-record">
+            <div class="crime-title">FIR-2023/00456 — VEHICLE THEFT</div>
+            <div class="crime-meta">STATION: CIVIL LINES PS | DATE: 22-APR-2023 | PENDING</div>
+          </div>
+
+          <div style="margin-top:12px;padding:10px;background:rgba(255,59,59,0.05);border:1px solid rgba(255,59,59,0.2);border-radius:3px;">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-muted);margin-bottom:4px;">RISK ASSESSMENT</div>
+            <div class="progress-bar-wrap"><div class="progress-fill" style="width:87%;background:linear-gradient(90deg,var(--accent-red),#ff6b6b);"></div></div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--accent-red);">87% HIGH RISK</div>
+          </div>
+
+          <button class="btn-proceed" onclick="goSlide(5)" style="margin-top:0;">GENERATE FINAL REPORT →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CASE B: No Evidence -->
+  <div id="case-b-content" style="display:none;">
+    <div class="invest-layout">
+      <div>
+        <div class="panel" style="margin-bottom:12px;">
+          <div class="panel-header">
+            <span class="panel-icon">📊</span>
+            <span class="panel-title">AI SUSPECT RANKING LIST</span>
+            <span class="panel-badge badge-pending">UNDER INVESTIGATION</span>
+          </div>
+
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--accent-gold);padding:8px;border:1px solid rgba(255,193,7,0.2);border-radius:3px;margin-bottom:12px;letter-spacing:1px;">
+            ⚠ STATUS: UNDER INVESTIGATION — AI GENERATED SUSPECT LIST
+          </div>
+
+          <div class="suspect-rank-card top">
+            <div class="rank-num first">#1</div>
+            <div class="rank-info">
+              <div class="rank-name">VIKRAM SINGH</div>
+              <div class="rank-meta">AGE: 28 | JAIPUR | 3 PRIOR FIRs</div>
+            </div>
+            <div>
+              <div class="risk-badge risk-high">HIGH RISK</div>
+              <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-muted);text-align:center;margin-top:4px;">87%</div>
+            </div>
+          </div>
+
+          <div class="suspect-rank-card">
+            <div class="rank-num">#2</div>
+            <div class="rank-info">
+              <div class="rank-name">ROHIT MEENA</div>
+              <div class="rank-meta">AGE: 31 | AJMER | 1 PRIOR FIR</div>
+            </div>
+            <div>
+              <div class="risk-badge risk-med">MED RISK</div>
+              <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-muted);text-align:center;margin-top:4px;">54%</div>
+            </div>
+          </div>
+
+          <div class="suspect-rank-card">
+            <div class="rank-num">#3</div>
+            <div class="rank-info">
+              <div class="rank-name">ANIL SHARMA</div>
+              <div class="rank-meta">AGE: 34 | BIKANER | 2 PRIOR FIRs</div>
+            </div>
+            <div>
+              <div class="risk-badge risk-med">MED RISK</div>
+              <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-muted);text-align:center;margin-top:4px;">42%</div>
+            </div>
+          </div>
+
+          <div class="suspect-rank-card">
+            <div class="rank-num">#4</div>
+            <div class="rank-info">
+              <div class="rank-name">SURESH KUMAR</div>
+              <div class="rank-meta">AGE: 26 | KOTA | CLEAN</div>
+            </div>
+            <div>
+              <div class="risk-badge risk-low">LOW RISK</div>
+              <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-muted);text-align:center;margin-top:4px;">21%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-icon">📤</span>
+            <span class="panel-title">SENT FOR FURTHER INSPECTION</span>
+          </div>
+          <div class="dispatch-list">
+            <div class="dispatch-item">
+              <span class="dispatch-station">MALVIYA NAGAR PS</span>
+              <span class="dispatch-time">24-MAR 08:30</span>
+              <span class="dispatch-check">✓ SENT</span>
+            </div>
+            <div class="dispatch-item">
+              <span class="dispatch-station">SIKAR CITY PS</span>
+              <span class="dispatch-time">24-MAR 08:45</span>
+              <span class="dispatch-check">✓ SENT</span>
+            </div>
+            <div class="dispatch-item">
+              <span class="dispatch-station">RAJASTHAN CRIME BRANCH</span>
+              <span class="dispatch-time">24-MAR 09:00</span>
+              <span class="dispatch-check" style="color:var(--accent-gold);">⏳ PENDING</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel" style="margin-bottom:12px;">
+          <div class="panel-header">
+            <span class="panel-icon">📜</span>
+            <span class="panel-title">PAST CRIMES & PREVIOUS FIRs</span>
+          </div>
+          <div class="crime-record">
+            <div class="crime-title">VIKRAM SINGH — FIR-2021/00872</div>
+            <div class="crime-meta">ROBBERY | MANSAROVAR PS | BAILED</div>
+          </div>
+          <div class="crime-record">
+            <div class="crime-title">VIKRAM SINGH — FIR-2022/01134</div>
+            <div class="crime-meta">ASSAULT | SIKAR PS | ACQUITTED</div>
+          </div>
+          <div class="crime-record" style="border-color:rgba(255,193,7,0.2);">
+            <div class="crime-title" style="color:var(--accent-gold);">ROHIT MEENA — FIR-2020/00556</div>
+            <div class="crime-meta">VEHICLE THEFT | AJMER PS | PENDING</div>
+          </div>
+        </div>
+
+        <div class="action-panel">
+          <div class="action-panel-title">⚡ RECOMMENDED ACTION</div>
+          <div class="action-item">
+            <span class="action-icon">▶</span>
+            <span>Detain VIKRAM SINGH for questioning at nearest station — highest AI-risk score with prior FIR match</span>
+          </div>
+          <div class="action-item">
+            <span class="action-icon">▶</span>
+            <span>Issue Look-Out Notice for all suspects in ranked list via CCTNS portal</span>
+          </div>
+          <div class="action-item">
+            <span class="action-icon">▶</span>
+            <span>Request call data records (CDR) from telecom for all suspects — March 24, 00:00–04:00</span>
+          </div>
+          <div class="action-item">
+            <span class="action-icon">▶</span>
+            <span>Cross-verify ROHIT MEENA's location via hometown station — possible accomplice</span>
+          </div>
+        </div>
+
+        <button class="btn-proceed" onclick="goSlide(5)" style="margin-top:12px;">GENERATE SUSPECT REPORT →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 5: FINAL REPORT -->
+<!-- ============================================================ -->
+<div class="slide" id="slide-5">
+  <div class="page-header">
+    <div class="page-title">📄 FINAL <span>REPORT</span></div>
+    <div class="page-sub">CASE CLOSURE / DISPATCH REPORT — CRIMENET SYSTEM v4.2</div>
+  </div>
+
+  <div class="report-layout">
+    <!-- Report Header -->
+    <div class="report-header-card">
+      <div class="report-seal">⚔</div>
+      <div class="report-title-area">
+        <div class="report-main-title">INVESTIGATION REPORT</div>
+        <div class="report-ref">REF: FIR/2024/001247 | GENERATED: 26-MAR-2024 | DSP RAJKUMAR SHARMA</div>
+        <div style="margin-top:8px;display:flex;gap:8px;">
+          <div class="tag tag-red">ARMED ROBBERY</div>
+          <div class="tag tag-blue">JAIPUR ZONE</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--accent-green);padding:2px 8px;background:rgba(0,230,118,0.1);border:1px solid var(--accent-green);border-radius:2px;">EVIDENCE: CONFIRMED</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Report type indicator — auto set by evidenceMode, no manual toggle -->
+    <div id="rep-indicator" style="margin-bottom:16px;">
+      <div id="rep-a-indicator" style="display:none; font-family:'Share Tech Mono',monospace; font-size:0.72rem; color:var(--accent-green); padding:10px 16px; background:rgba(0,230,118,0.07); border:1px solid rgba(0,230,118,0.3); border-radius:3px; letter-spacing:2px;">
+        ✅ CONFIRMED SUSPECT REPORT — BIOMETRIC EVIDENCE AVAILABLE — ARREST WARRANT CAN BE ISSUED
+      </div>
+      <div id="rep-b-indicator" style="display:none; font-family:'Share Tech Mono',monospace; font-size:0.72rem; color:var(--accent-gold); padding:10px 16px; background:rgba(255,193,7,0.07); border:1px solid rgba(255,193,7,0.3); border-radius:3px; letter-spacing:2px;">
+        🔶 SUSPECT LIST REPORT — NO CONFIRMED MATCH — DISPATCHING ALL SUSPECTS FOR FURTHER INSPECTION
+      </div>
+    </div>
+
+    <!-- REPORT A: Confirmed -->
+    <div class="tab-content active" id="rep-a">
+      <div class="report-body-grid">
+        <div class="panel">
+          <div class="confirmed-suspect">
+            <div class="confirmed-avatar">👤</div>
+            <div class="confirmed-label">⚠ PRIMARY SUSPECT CONFIRMED</div>
+            <div class="confirmed-name">VIKRAM SINGH</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-muted);margin-top:6px;">AGE: 28 | JAIPUR, RAJASTHAN</div>
+            <div style="margin-top:12px;padding:8px;background:rgba(255,59,59,0.1);border:1px solid var(--accent-red);border-radius:3px;">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--accent-red);letter-spacing:1px;">MATCH: 94.7% FACE + FINGERPRINT</div>
+            </div>
+          </div>
+
+          <div class="detail-section" style="margin-top:14px;">
+            <div class="detail-section-title">EVIDENCE SUMMARY</div>
+            <div class="detail-row"><span class="detail-key">FACE SCAN</span><span class="detail-val green">✓ MATCHED</span></div>
+            <div class="detail-row"><span class="detail-key">FINGERPRINT</span><span class="detail-val green">✓ MATCHED</span></div>
+            <div class="detail-row"><span class="detail-key">CCTV SOURCE</span><span class="detail-val">CAM-04 SECTOR-14</span></div>
+            <div class="detail-row"><span class="detail-key">PRIOR FIRs</span><span class="detail-val red">3 CASES</span></div>
+            <div class="detail-row"><span class="detail-key">RISK SCORE</span><span class="detail-val red">87% HIGH</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-icon">📡</span>
+            <span class="panel-title">DISPATCH TO STATIONS</span>
+          </div>
+
+          <div class="dispatch-list">
+            <div class="dispatch-item">
+              <span class="dispatch-station">MALVIYA NAGAR PS</span>
+              <span class="dispatch-time">PRIMARY</span>
+              <span class="dispatch-check">✓ SENT</span>
+            </div>
+            <div class="dispatch-item">
+              <span class="dispatch-station">SIKAR CITY PS</span>
+              <span class="dispatch-time">HOMETOWN</span>
+              <span class="dispatch-check">✓ SENT</span>
+            </div>
+            <div class="dispatch-item">
+              <span class="dispatch-station">RAJASTHAN CRIME BRANCH</span>
+              <span class="dispatch-time">STATE</span>
+              <span class="dispatch-check">✓ SENT</span>
+            </div>
+            <div class="dispatch-item">
+              <span class="dispatch-station">NCCRB — NATIONAL</span>
+              <span class="dispatch-time">NATIONAL</span>
+              <span class="dispatch-check">✓ SENT</span>
+            </div>
+            <div class="dispatch-item">
+              <span class="dispatch-station">RAJASTHAN HIGH COURT</span>
+              <span class="dispatch-time">JUDICIARY</span>
+              <span class="dispatch-check" style="color:var(--accent-gold);">⏳ PENDING</span>
+            </div>
+          </div>
+
+          <div class="final-actions" style="margin-top:16px;">
+            <button class="final-btn confirm" onclick="showToast('⚠ ARREST WARRANT ISSUED FOR VIKRAM SINGH')">🚨 ISSUE ARREST WARRANT</button>
+            <button class="final-btn send" onclick="showToast('📡 REPORT DISPATCHED TO ALL STATIONS')">📡 DISPATCH REPORT</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORT B: Suspect List -->
+    <div class="tab-content" id="rep-b">
+      <div class="report-body-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-icon">📋</span>
+            <span class="panel-title">RANKED SUSPECT REPORT — NO CONFIRMED MATCH</span>
+          </div>
+
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--accent-gold);padding:10px;background:rgba(255,193,7,0.05);border:1px solid rgba(255,193,7,0.2);border-radius:3px;margin-bottom:14px;letter-spacing:1px;">
+            ⚠ PRIMARY SUSPECT NOT YET CONFIRMED — SENT FOR FURTHER INSPECTION
+          </div>
+
+          <div class="suspect-rank-card top" style="margin-bottom:8px;">
+            <div class="rank-num first">#1</div>
+            <div class="rank-info"><div class="rank-name">VIKRAM SINGH</div><div class="rank-meta">HIGHEST RISK — 3 PRIORS | JAIPUR</div></div>
+            <div class="risk-badge risk-high">87% HIGH</div>
+          </div>
+          <div class="suspect-rank-card" style="margin-bottom:8px;">
+            <div class="rank-num">#2</div>
+            <div class="rank-info"><div class="rank-name">ROHIT MEENA</div><div class="rank-meta">1 PRIOR | AJMER</div></div>
+            <div class="risk-badge risk-med">54% MED</div>
+          </div>
+          <div class="suspect-rank-card" style="margin-bottom:8px;">
+            <div class="rank-num">#3</div>
+            <div class="rank-info"><div class="rank-name">ANIL SHARMA</div><div class="rank-meta">2 PRIORS | BIKANER</div></div>
+            <div class="risk-badge risk-med">42% MED</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-icon">📡</span>
+            <span class="panel-title">DISPATCH STATUS</span>
+          </div>
+
+          <div class="dispatch-list">
+            <div class="dispatch-item">
+              <span class="dispatch-station">MALVIYA NAGAR PS</span>
+              <span class="dispatch-time">PRIMARY</span>
+              <span class="dispatch-check">✓ SENT</span>
+            </div>
+            <div class="dispatch-item">
+              <span class="dispatch-station">SIKAR CITY PS</span>
+              <span class="dispatch-time">ZONE</span>
+              <span class="dispatch-check">✓ SENT</span>
+            </div>
+            <div class="dispatch-item">
+              <span class="dispatch-station">AJMER PS</span>
+              <span class="dispatch-time">ZONE</span>
+              <span class="dispatch-check" style="color:var(--accent-gold);">⏳ PENDING</span>
+            </div>
+            <div class="dispatch-item">
+              <span class="dispatch-station">RAJASTHAN CRIME BRANCH</span>
+              <span class="dispatch-time">STATE</span>
+              <span class="dispatch-check" style="color:var(--accent-gold);">⏳ PENDING</span>
+            </div>
+          </div>
+
+          <div class="action-panel" style="margin-top:14px;">
+            <div class="action-panel-title">⚡ RECOMMENDED ACTION</div>
+            <div class="action-item">
+              <span class="action-icon">▶</span>
+              <span>Issue Look-Out Circular (LOC) for all ranked suspects via CCTNS portal immediately</span>
+            </div>
+            <div class="action-item">
+              <span class="action-icon">▶</span>
+              <span>Dispatch suspect list to all zones — further interrogation required before any arrest</span>
+            </div>
+            <div class="action-item">
+              <span class="action-icon">▶</span>
+              <span>No arrest warrant can be issued — suspect identity not yet confirmed by biometric evidence</span>
+            </div>
+          </div>
+
+          <div style="margin-top:12px; padding:10px; background:rgba(255,59,59,0.05); border:1px solid rgba(255,59,59,0.2); border-radius:3px; font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--accent-red); letter-spacing:1px;">
+            🚫 ARREST WARRANT CANNOT BE ISSUED — PRIMARY SUSPECT NOT CONFIRMED
+          </div>
+
+          <div class="final-actions" style="margin-top:16px;">
+            <button class="final-btn send" onclick="dispatchSuspectList()">📋 FILE SUSPECT LIST REPORT</button>
+            <button class="final-btn send" onclick="dispatchAllStations()">📡 DISPATCH TO ALL STATIONS</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Close case -->
+    <div style="margin-top:16px;padding:16px;background:rgba(0,170,255,0.03);border:1px solid var(--border-dim);border-radius:4px;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-muted);letter-spacing:1px;">CASE: FIR/2024/001247 | INVESTIGATING: DSP RAJKUMAR SHARMA | CRIMENET v4.2</div>
+      <button class="final-btn send" onclick="showToast('✅ CASE REPORT ARCHIVED IN CRIMENET DATABASE')">📁 ARCHIVE CASE</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- JAVASCRIPT -->
+<!-- ============================================================ -->
+<script src="app.js"></script>
+</body>
+</html>
